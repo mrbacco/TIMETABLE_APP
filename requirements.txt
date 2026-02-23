@@ -1,0 +1,11 @@
+﻿# """
+# TEACHERS APP project 
+# Timetable allocation tool done with flask and AI powered
+#
+# mrbacco04@gmail.com
+# Feb 23, 2026 
+#
+# """
+flask>=3.0,<4.0
+flask-sqlalchemy>=3.1,<4.0
+

@@ -1,0 +1,291 @@
+﻿<!--
+"""
+TEACHERS APP project 
+Timetable allocation tool done with flask and AI powered
+
+mrbacco04@gmail.com
+Feb 23, 2026 
+
+"""
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Time Allocator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-active-day="{{ active_day }}">
+  <header class="hero">
+    <h1>Teacher Time Allocator</h1>
+    <p>CRUD for teachers and skills, plus weekly timetable allocation with day tabs.</p>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <section class="flash-wrap">
+        {% for category, message in messages %}
+          <p class="flash {{ category }}">{{ message }}</p>
+        {% endfor %}
+      </section>
+    {% endif %}
+  {% endwith %}
+
+  <main class="layout">
+    <section class="panel panel-wide">
+      <h2>Bulk Import (CSV)</h2>
+      <div class="import-grid">
+        <form method="post" action="{{ url_for('import_skills_csv') }}" enctype="multipart/form-data" class="stack">
+          <label>
+            Skills CSV
+            <input type="file" name="skills_file" accept=".csv" required />
+          </label>
+          <p class="hint">Headers: <code>name</code> (or <code>skill</code>, <code>skill_name</code>)</p>
+          <button type="submit">Import Skills CSV</button>
+        </form>
+
+        <form method="post" action="{{ url_for('import_teachers_csv') }}" enctype="multipart/form-data" class="stack">
+          <label>
+            Teachers CSV
+            <input type="file" name="teachers_file" accept=".csv" required />
+          </label>
+          <p class="hint">Headers: <code>name</code>, <code>skills</code> (<code>free_slots</code> optional)</p>
+          <p class="hint">Inside each field use <code>|</code>, <code>;</code>, or <code>,</code> separators.</p>
+          <button type="submit">Import Teachers CSV</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Skills</h2>
+      <form method="post" action="{% if edit_skill %}{{ url_for('update_skill', skill_id=edit_skill.id) }}{% else %}{{ url_for('create_skill') }}{% endif %}" class="stack">
+        <label>
+          Skill name
+          <input name="name" required value="{{ edit_skill.name if edit_skill else '' }}" placeholder="e.g. Math" />
+        </label>
+        <div class="action-row">
+          <button type="submit">{% if edit_skill %}Update Skill{% else %}Add Skill{% endif %}</button>
+          {% if edit_skill %}<a class="link-btn" href="{{ url_for('index') }}">Cancel</a>{% endif %}
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for skill in skills %}
+              <tr>
+                <td>{{ skill.name }}</td>
+                <td class="actions">
+                  <a class="link-btn" href="{{ url_for('index', edit_skill_id=skill.id) }}">Edit</a>
+                  <form method="post" action="{{ url_for('delete_skill', skill_id=skill.id) }}" onsubmit="return confirm('Delete this skill?')">
+                    <button class="danger" type="submit">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="2" class="muted">No skills yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Teachers</h2>
+      <form method="post" action="{% if edit_teacher %}{{ url_for('update_teacher', teacher_id=edit_teacher.id) }}{% else %}{{ url_for('create_teacher') }}{% endif %}" class="stack">
+        <label>
+          Name
+          <input name="name" required value="{{ edit_teacher.name if edit_teacher else '' }}" placeholder="e.g. Ms. Johnson" />
+        </label>
+        <label>
+          Skills (multi-select)
+          <select name="skill_ids" multiple size="5">
+            {% for skill in skills %}
+              <option value="{{ skill.id }}" {% if skill.id in edit_teacher_skill_ids %}selected{% endif %}>{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <div class="action-row">
+          <button type="submit">{% if edit_teacher %}Update Teacher{% else %}Add Teacher{% endif %}</button>
+          {% if edit_teacher %}<a class="link-btn" href="{{ url_for('index') }}">Cancel</a>{% endif %}
+        </div>
+      </form>
+
+      <details class="collapse-block" {% if edit_teacher %}open{% endif %}>
+        <summary>Teacher list ({{ teachers|length }})</summary>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Skills</th>
+                <th>Free slots</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for teacher in teachers %}
+                <tr>
+                  <td>{{ teacher.name }}</td>
+                  <td>{{ teacher.skills | map(attribute='name') | join(', ') if teacher.skills else 'None' }}</td>
+                  <td>{{ teacher.free_slots }}</td>
+                  <td class="actions">
+                    <a class="link-btn" href="{{ url_for('index', edit_teacher_id=teacher.id) }}">Edit</a>
+                    <form method="post" action="{{ url_for('delete_teacher', teacher_id=teacher.id) }}" onsubmit="return confirm('Delete this teacher?')">
+                      <button class="danger" type="submit">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="4" class="muted">No teachers yet.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section class="panel panel-wide">
+      <div class="sessions-header">
+        <h2>Weekly Sessions</h2>
+        <form method="post" action="{{ url_for('run_allocation') }}" class="alloc-form">
+          <button type="submit">Auto Allocate</button>
+          <span class="meta">Unassigned: {{ unassigned_count }}</span>
+        </form>
+      </div>
+
+      {% if skills|length == 0 %}
+        <p class="muted">Add at least one skill before creating session cells.</p>
+      {% endif %}
+
+      <div class="tabs" role="tablist" aria-label="Week days">
+        {% for day in week_days %}
+          <button type="button" class="tab-btn" data-day-tab="{{ day }}">{{ day }}</button>
+        {% endfor %}
+      </div>
+
+      {% for day in week_days %}
+        <section class="day-panel" data-day-panel="{{ day }}">
+          <div class="schedule-wrap">
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th class="time-col">Period</th>
+                  {% for year_group in year_groups %}
+                    <th>{{ year_group }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in schedule[day] %}
+                  {% if row.is_lunch %}
+                    <tr class="lunch-row">
+                      <td class="time-col">{{ row.slot }}</td>
+                      <td colspan="{{ year_groups|length }}">Lunch break</td>
+                    </tr>
+                  {% else %}
+                    <tr>
+                      <td class="time-col">{{ row.slot }}</td>
+                      {% for cell in row.cells %}
+                        <td>
+                          <form method="post" action="{{ url_for('save_grid_session') }}" class="cell-form">
+                            <input type="hidden" name="day" value="{{ cell.day }}" />
+                            <input type="hidden" name="slot" value="{{ cell.slot }}" />
+                            <input type="hidden" name="year_group" value="{{ cell.year_group }}" />
+                            <input type="hidden" name="active_day" value="{{ day }}" />
+
+                            <label class="cell-label">
+                              Skill
+                              <select name="required_skill_id" required>
+                                <option value="">Select</option>
+                                {% for skill in skills %}
+                                  <option value="{{ skill.id }}" {% if cell.required_skill_id == skill.id %}selected{% endif %}>{{ skill.name }}</option>
+                                {% endfor %}
+                              </select>
+                            </label>
+
+                            <label class="cell-label">
+                              Teacher
+                              <select name="assigned_teacher_id" {% if skills|length == 0 %}disabled{% endif %}>
+                                <option value="">Unassigned</option>
+                                {% for teacher_option in cell.teacher_options %}
+                                  {% set disable_option = (not teacher_option.selectable) and (not teacher_option.selected) %}
+                                  <option value="{{ teacher_option.id }}" {% if teacher_option.selected %}selected{% endif %} {% if disable_option %}disabled{% endif %}>
+                                    {{ teacher_option.name }} ({{ teacher_option.skills }})
+                                    {% if teacher_option.busy %} - Busy{% elif not teacher_option.available %} - Not free{% elif not teacher_option.has_skill %} - Missing skill{% endif %}
+                                  </option>
+                                {% endfor %}
+                              </select>
+                            </label>
+
+                            <p class="assigned-status {% if cell.assigned_teacher_name %}filled{% endif %}">
+                              Assigned: {{ cell.assigned_teacher_name if cell.assigned_teacher_name else 'Unassigned' }}
+                            </p>
+
+                            <button type="submit" {% if skills|length == 0 %}disabled{% endif %}>Save</button>
+                          </form>
+
+                          {% if cell.session_id %}
+                            <form method="post" action="{{ url_for('clear_grid_session') }}" class="cell-clear-form">
+                              <input type="hidden" name="day" value="{{ cell.day }}" />
+                              <input type="hidden" name="slot" value="{{ cell.slot }}" />
+                              <input type="hidden" name="year_group" value="{{ cell.year_group }}" />
+                              <input type="hidden" name="active_day" value="{{ day }}" />
+                              <button type="submit" class="ghost">Clear</button>
+                            </form>
+                          {% endif %}
+                        </td>
+                      {% endfor %}
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      {% endfor %}
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const tabButtons = document.querySelectorAll("[data-day-tab]");
+      const dayPanels = document.querySelectorAll("[data-day-panel]");
+      const initialDay = document.body.dataset.activeDay || (tabButtons[0] ? tabButtons[0].dataset.dayTab : "");
+
+      function activateDay(day) {
+        tabButtons.forEach((button) => {
+          const active = button.dataset.dayTab === day;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-selected", active ? "true" : "false");
+        });
+
+        dayPanels.forEach((panel) => {
+          panel.classList.toggle("active", panel.dataset.dayPanel === day);
+        });
+      }
+
+      tabButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+          activateDay(button.dataset.dayTab);
+        });
+      });
+
+      if (initialDay) {
+        activateDay(initialDay);
+      }
+    })();
+  </script>
+</body>
+</html>

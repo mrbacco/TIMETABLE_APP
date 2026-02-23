@@ -1,0 +1,386 @@
+﻿/*
+"""
+TEACHERS APP project 
+Timetable allocation tool done with flask and AI powered
+
+mrbacco04@gmail.com
+Feb 23, 2026 
+
+"""
+*/
+:root {
+  --bg: #eef4f7;
+  --surface: #ffffff;
+  --ink: #1a2b32;
+  --muted: #5f7480;
+  --line: #d6e0e6;
+  --accent: #0d9488;
+  --accent-strong: #0f766e;
+  --danger: #b91c1c;
+  --danger-strong: #991b1b;
+  --ok-bg: #ecfdf5;
+  --ok-ink: #065f46;
+  --err-bg: #fff1f2;
+  --err-ink: #9f1239;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 8% 10%, #cffafe 0%, transparent 36%),
+    radial-gradient(circle at 90% 92%, #d1fae5 0%, transparent 35%),
+    var(--bg);
+}
+
+.hero {
+  text-align: center;
+  padding: 2rem 1rem 1rem;
+}
+
+.hero h1 {
+  margin: 0;
+}
+
+.hero p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+
+.flash-wrap {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.flash {
+  margin: 0.4rem 0;
+  border-radius: 8px;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--line);
+}
+
+.flash.success {
+  background: var(--ok-bg);
+  color: var(--ok-ink);
+}
+
+.flash.error {
+  background: var(--err-bg);
+  color: var(--err-ink);
+}
+
+.layout {
+  max-width: 1300px;
+  margin: 0 auto 2rem;
+  padding: 0 1rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(26, 43, 50, 0.06);
+  padding: 1rem;
+}
+
+.panel-wide {
+  grid-column: 1 / -1;
+}
+
+h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.15rem;
+}
+
+.stack {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.import-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.92rem;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+input[type="file"] {
+  padding: 0.45rem;
+}
+
+select[multiple] {
+  min-height: 130px;
+}
+
+button,
+.link-btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+button:hover,
+.link-btn:hover {
+  background: var(--accent-strong);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.danger {
+  background: var(--danger);
+}
+
+button.danger:hover {
+  background: var(--danger-strong);
+}
+
+.action-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sessions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.alloc-form {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.table-wrap {
+  margin-top: 0.9rem;
+  overflow-x: auto;
+}
+
+.collapse-block {
+  margin-top: 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
+  background: #fbfdff;
+}
+
+.collapse-block summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #214556;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 560px;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid var(--line);
+  padding: 0.55rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.93rem;
+}
+
+.data-table th {
+  background: #f8fbfd;
+}
+
+.data-table .actions {
+  min-width: 160px;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.data-table .actions form {
+  margin: 0;
+}
+
+.tabs {
+  margin-top: 0.9rem;
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: #e6f6f4;
+  color: #0b5f58;
+  border: 1px solid #bae6e1;
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.day-panel {
+  display: none;
+  margin-top: 0.9rem;
+}
+
+.day-panel.active {
+  display: block;
+}
+
+.schedule-wrap {
+  overflow-x: auto;
+}
+
+.schedule-table {
+  width: 100%;
+  min-width: 1200px;
+  border-collapse: collapse;
+}
+
+.schedule-table th,
+.schedule-table td {
+  border: 1px solid var(--line);
+  vertical-align: top;
+  padding: 0.45rem;
+  background: #fff;
+}
+
+.schedule-table th {
+  background: #f6fbfb;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.schedule-table .time-col {
+  width: 130px;
+  min-width: 130px;
+  font-weight: 700;
+  background: #f8fbfd;
+}
+
+.lunch-row td {
+  background: #fffbe6;
+  font-weight: 600;
+  text-align: center;
+}
+
+.cell-form {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.cell-label {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+  color: #36505b;
+}
+
+.cell-form select,
+.cell-form input {
+  font-size: 0.8rem;
+  padding: 0.4rem;
+}
+
+.cell-form button,
+.cell-clear-form button {
+  font-size: 0.78rem;
+  padding: 0.38rem 0.5rem;
+}
+
+.assigned-status {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  padding: 0.28rem 0.4rem;
+}
+
+.assigned-status.filled {
+  color: #0f766e;
+  border-style: solid;
+  border-color: #99f6e4;
+  background: #f0fdfa;
+}
+
+.cell-clear-form {
+  margin-top: 0.35rem;
+}
+
+button.ghost {
+  background: #eef2ff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+button.ghost:hover {
+  background: #e2e8f0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sessions-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
