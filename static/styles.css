@@ -1,27 +1,16 @@
-﻿/*
-"""
-TEACHERS APP project 
-Timetable allocation tool done with flask and AI powered
-
-mrbacco04@gmail.com
-Feb 23, 2026 
-
-"""
-*/
 :root {
-  --bg: #eef4f7;
-  --surface: #ffffff;
-  --ink: #1a2b32;
-  --muted: #5f7480;
-  --line: #d6e0e6;
-  --accent: #0d9488;
-  --accent-strong: #0f766e;
-  --danger: #b91c1c;
-  --danger-strong: #991b1b;
-  --ok-bg: #ecfdf5;
-  --ok-ink: #065f46;
-  --err-bg: #fff1f2;
-  --err-ink: #9f1239;
+  --bg: #f6f8fb;
+  --panel: #ffffff;
+  --ink: #102038;
+  --muted: #60708a;
+  --accent: #1464b3;
+  --accent-strong: #0f5498;
+  --line: #d8e0ea;
+  --warn: #8a1f1f;
+  --ok-bg: #eff9f2;
+  --ok-ink: #1f6b32;
+  --err-bg: #fff2f2;
+  --err-ink: #8a1f1f;
 }
 
 * {
@@ -30,39 +19,39 @@ Feb 23, 2026
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, sans-serif;
   color: var(--ink);
-  background:
-    radial-gradient(circle at 8% 10%, #cffafe 0%, transparent 36%),
-    radial-gradient(circle at 90% 92%, #d1fae5 0%, transparent 35%),
-    var(--bg);
+  background: linear-gradient(180deg, #edf3fa 0%, #f9fbfd 100%);
 }
 
 .hero {
   text-align: center;
-  padding: 2rem 1rem 1rem;
+  padding: 24px 16px 10px;
 }
 
 .hero h1 {
   margin: 0;
+  color: #0f2d52;
+  letter-spacing: 0.2px;
 }
 
 .hero p {
-  margin: 0.5rem 0 0;
+  margin: 8px 0 0;
   color: var(--muted);
 }
 
 .flash-wrap {
   max-width: 1300px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 16px;
 }
 
 .flash {
-  margin: 0.4rem 0;
+  margin: 8px 0;
   border-radius: 8px;
-  padding: 0.65rem 0.8rem;
+  padding: 10px 12px;
   border: 1px solid var(--line);
+  font-size: 14px;
 }
 
 .flash.success {
@@ -77,19 +66,20 @@ body {
 
 .layout {
   max-width: 1300px;
-  margin: 0 auto 2rem;
-  padding: 0 1rem;
+  margin: 0 auto 32px;
+  padding: 0 16px;
   display: grid;
-  gap: 1rem;
+  gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  align-items: start;
 }
 
 .panel {
-  background: var(--surface);
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
-  box-shadow: 0 10px 24px rgba(26, 43, 50, 0.06);
-  padding: 1rem;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(16, 32, 56, 0.08);
 }
 
 .panel-wide {
@@ -97,39 +87,51 @@ body {
 }
 
 h2 {
-  margin: 0 0 0.8rem;
-  font-size: 1.15rem;
+  margin: 0 0 10px;
+  color: #0f2d52;
+  letter-spacing: 0.2px;
 }
 
 .stack {
   display: grid;
-  gap: 0.6rem;
+  gap: 10px;
 }
 
 .import-grid {
   display: grid;
-  gap: 0.9rem;
+  gap: 10px;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 label {
   display: grid;
-  gap: 0.35rem;
-  font-size: 0.92rem;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 0;
+}
+
+input,
+select,
+button,
+.link-btn {
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  box-sizing: border-box;
 }
 
 input,
 select {
   width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0.55rem 0.65rem;
-  font-size: 0.95rem;
-  background: #fff;
+  min-width: 0;
 }
 
 input[type="file"] {
-  padding: 0.45rem;
+  max-width: 100%;
+  padding: 8px;
 }
 
 select[multiple] {
@@ -139,17 +141,15 @@ select[multiple] {
 button,
 .link-btn {
   border: 0;
-  border-radius: 8px;
-  padding: 0.55rem 0.75rem;
   background: var(--accent);
   color: #fff;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
+  width: fit-content;
 }
 
 button:hover,
@@ -163,86 +163,101 @@ button:disabled {
 }
 
 button.danger {
-  background: var(--danger);
+  background: var(--warn);
 }
 
 button.danger:hover {
-  background: var(--danger-strong);
+  background: #741919;
 }
 
 .action-row {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .sessions-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .alloc-form {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .meta {
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 13px;
 }
 
 .hint {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 13px;
   color: var(--muted);
 }
 
 .table-wrap {
-  margin-top: 0.9rem;
+  margin-top: 10px;
   overflow-x: auto;
 }
 
 .collapse-block {
-  margin-top: 0.9rem;
+  margin-top: 10px;
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: 0.55rem 0.65rem;
-  background: #fbfdff;
+  padding: 10px 12px;
+  background: #f7fbff;
 }
 
 .collapse-block summary {
   cursor: pointer;
-  font-weight: 600;
-  color: #214556;
+  font-weight: 700;
+  color: #174a80;
+}
+
+.data-table,
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
 }
 
 .data-table {
-  width: 100%;
-  border-collapse: collapse;
   min-width: 560px;
 }
 
-.data-table th,
-.data-table td {
-  border: 1px solid var(--line);
-  padding: 0.55rem 0.6rem;
-  text-align: left;
-  vertical-align: top;
-  font-size: 0.93rem;
+.schedule-table {
+  min-width: 1200px;
 }
 
-.data-table th {
-  background: #f8fbfd;
+.data-table th,
+.data-table td,
+.schedule-table th,
+.schedule-table td {
+  border: 1px solid var(--line);
+  padding: 7px 8px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+.data-table th,
+.schedule-table th {
+  background: #edf4fc;
+  color: #0f2d52;
 }
 
 .data-table .actions {
-  min-width: 160px;
+  min-width: 170px;
   display: flex;
-  gap: 0.4rem;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
@@ -251,16 +266,16 @@ button.danger:hover {
 }
 
 .tabs {
-  margin-top: 0.9rem;
+  margin-top: 10px;
   display: flex;
-  gap: 0.45rem;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .tab-btn {
-  background: #e6f6f4;
-  color: #0b5f58;
-  border: 1px solid #bae6e1;
+  background: #e8f1fb;
+  color: #174a80;
+  border: 1px solid #c5d9ef;
 }
 
 .tab-btn.active {
@@ -271,7 +286,7 @@ button.danger:hover {
 
 .day-panel {
   display: none;
-  margin-top: 0.9rem;
+  margin-top: 10px;
 }
 
 .day-panel.active {
@@ -282,92 +297,73 @@ button.danger:hover {
   overflow-x: auto;
 }
 
-.schedule-table {
-  width: 100%;
-  min-width: 1200px;
-  border-collapse: collapse;
-}
-
-.schedule-table th,
-.schedule-table td {
-  border: 1px solid var(--line);
-  vertical-align: top;
-  padding: 0.45rem;
-  background: #fff;
-}
-
-.schedule-table th {
-  background: #f6fbfb;
-  text-align: center;
-  font-size: 0.9rem;
-}
-
 .schedule-table .time-col {
   width: 130px;
   min-width: 130px;
   font-weight: 700;
-  background: #f8fbfd;
+  background: #f3f8fe;
 }
 
 .lunch-row td {
-  background: #fffbe6;
-  font-weight: 600;
+  background: #fffbe8;
+  font-weight: 700;
   text-align: center;
 }
 
 .cell-form {
   display: grid;
-  gap: 0.35rem;
+  gap: 6px;
 }
 
 .cell-label {
   display: grid;
-  gap: 0.2rem;
-  font-size: 0.78rem;
-  color: #36505b;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #31527a;
 }
 
 .cell-form select,
 .cell-form input {
-  font-size: 0.8rem;
-  padding: 0.4rem;
+  font-size: 12px;
+  padding: 6px 8px;
 }
 
 .cell-form button,
 .cell-clear-form button {
-  font-size: 0.78rem;
-  padding: 0.38rem 0.5rem;
+  font-size: 12px;
+  padding: 6px 8px;
 }
 
 .assigned-status {
   margin: 0;
-  font-size: 0.78rem;
-  color: #64748b;
-  background: #f8fafc;
-  border: 1px dashed #cbd5e1;
+  font-size: 12px;
+  color: var(--muted);
+  background: #f5f8fc;
+  border: 1px dashed #c6d5e6;
   border-radius: 6px;
-  padding: 0.28rem 0.4rem;
+  padding: 6px 8px;
 }
 
 .assigned-status.filled {
-  color: #0f766e;
+  color: #174a80;
   border-style: solid;
-  border-color: #99f6e4;
-  background: #f0fdfa;
+  border-color: #b7cfe8;
+  background: #eef5fd;
 }
 
 .cell-clear-form {
-  margin-top: 0.35rem;
+  margin-top: 6px;
 }
 
 button.ghost {
-  background: #eef2ff;
-  color: #334155;
-  border: 1px solid #cbd5e1;
+  background: #eef4fb;
+  color: #27496c;
+  border: 1px solid #c3d5e8;
 }
 
 button.ghost:hover {
-  background: #e2e8f0;
+  background: #e2ebf6;
 }
 
 .muted {
